@@ -2,3 +2,5 @@
 *.nx3a
 Usage.md
 *.mdva
+*.yap
+.yapviewstack
