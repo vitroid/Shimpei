@@ -4,8 +4,10 @@
 	python to_mdview.py $< > $@
 %.yap: %.pickle to_yaplot.py
 	python to_yaplot.py $< > $@
-%.+1.pickle: %.pickle
+%.+1.pickle: %.pickle trial_move.py
 	python trial_move.py $< 1 $@
+%.+10.pickle: %.pickle trial_move.py
+	python trial_move.py $< 10 $@
 
 
 1h.nx3a:
