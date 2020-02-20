@@ -31,11 +31,8 @@ def invert_edge(G, from_, to_):
     invert an edge
     """
     assert G.has_edge(from_, to_)
-    fix = G[from_][to_]['fixed']
     G.remove_edge(from_, to_)
-    G.add_edge(to_, from_, fixed=fix)
-
-
+    G.add_edge(to_, from_)
 
 def move_anion(G, anion):
     # 隣の水分子をさがす
@@ -69,17 +66,6 @@ def move_anion(G, anion):
     # イオンと水の周囲の水素結合の向きを確認
     assert G.in_degree(water) == 2
     assert G.in_degree(anion) == 4
-    # anionの周囲のHBは無条件で固定
-    for nei in G.predecessors(anion):
-        G[nei][anion]['fixed'] = True
-    # 水の周囲については、
-    # 水はもともとはanionだったので、結合はすべてfixedであった。
-    # 2本の結合が反転し、outboundに変わった。
-    # そのうち1つは新anionとの結合で無条件にfixedされる。
-    # もう一方は、必ず水分子なので、fixedしない。
-    for nei in G.successors(water):
-        if nei != anion:
-            G[water][nei]['fixed'] = False
     return G
 
 
@@ -115,17 +101,6 @@ def move_cation(G, cation):
     # イオンと水の周囲の水素結合の向きを確認
     assert G.in_degree(water) == 2
     assert G.out_degree(cation) == 4
-    # anionの周囲のHBは無条件で固定
-    for nei in G.predecessors(cation):
-        G[cation][nei]['fixed'] = True
-    # 水の周囲については、
-    # 水はもともとはcationだったので、結合はすべてfixedであった。
-    # 2本の結合が反転し、inboundに変わった。
-    # そのうち1つは新cationとの結合で無条件にfixedされる。
-    # もう一方は、必ず水分子なので、fixedしない。
-    for nei in G.predecessors(water):
-        if nei != cation:
-            G[nei][water]['fixed'] = False
     return G
 
 def pick_anions(G):
@@ -189,6 +164,7 @@ while nMove > 0:
 
 anions = pick_anions(G)
 cations = pick_cations(G)
+assert len(anions) == len(cations)
 
 with open(outfile, "wb") as f:
     pickle.dump([cellmat, rpos, anions, cations, G], f)

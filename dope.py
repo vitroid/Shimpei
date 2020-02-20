@@ -80,7 +80,7 @@ def hbn(rcom, cellmat, R, water, icetest=True):
                 dmin = L2
                 hb   = (j, i) # j to i
         if hb is not None:
-            dg.add_edge(*hb, fixed=False)
+            dg.add_edge(*hb)
     if icetest:
         for x in dg.out_degree(dg):
             assert x[1]==2, x
@@ -94,7 +94,8 @@ def cationizable(G, target):
     if G.out_degree(target) != 2:
         return False
     for i in G.predecessors(target):
-        if G[i][target]['fixed']:
+        if G.out_degree(i) == 4:
+            # if the neighbor is also a cation,
             logger.debug('Cancelled by conflict.')
             return False
     return True
@@ -104,7 +105,8 @@ def anionizable(G, target):
     if G.out_degree(target) != 2:
         return False
     for j in G.successors(target):
-        if G[target][j]['fixed']:
+        if G.in_degree(i) == 4:
+            # if the neighbor is also an anion,
             logger.debug('Cancelled by conflict.')
             return False
     return True
@@ -153,10 +155,8 @@ def invert_edge(G, from_, to_):
     invert an edge
     """
     assert G.has_edge(from_, to_)
-    assert not G[from_][to_]['fixed']
-    fix = G[from_][to_]['fixed']
     G.remove_edge(from_, to_)
-    G.add_edge(to_, from_, fixed=fix)
+    G.add_edge(to_, from_)
 
 def bulkdope(G, nIon):
     """
@@ -188,10 +188,6 @@ def bulkdope(G, nIon):
             continue
         logger.debug("Path1: {0}".format(path1))
         # homodromic path上にイオンが含まれる心配はない。
-        # 念のため確認する。
-        for i in range(len(path1)-1):
-            a,b = path1[i], path1[i+1]
-            assert not G[a][b]['fixed']
         # pathをedgeの集合に変換
         edges1 = path2edges(path1)
         # 2本目の経路は、1本目の経路を除去してから探す。
@@ -214,10 +210,6 @@ def bulkdope(G, nIon):
         # イオンの周囲の水素結合の向きを確認
         assert G.in_degree(anion) == 4
         assert G.out_degree(cation) == 4
-        for nei in G.predecessors(anion):
-            G[nei][anion]['fixed'] = True
-        for nei in G.successors(cation):
-            G[cation][nei]['fixed'] = True
         anions.add(anion)
         cations.add(cation)
         N -= 1
