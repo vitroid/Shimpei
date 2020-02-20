@@ -91,6 +91,8 @@ def cationizable(G, target):
     target位置にある水分子がcationに変換できるかどうかを判定する。
     """
     logger = getLogger()
+    if G.out_degree(target) != 2:
+        return False
     for i in G.predecessors(target):
         if G[i][target]['fixed']:
             logger.debug('Cancelled by conflict.')
@@ -99,6 +101,8 @@ def cationizable(G, target):
 
 def anionizable(G, target):
     logger = getLogger()
+    if G.out_degree(target) != 2:
+        return False
     for j in G.successors(target):
         if G[target][j]['fixed']:
             logger.debug('Cancelled by conflict.')
