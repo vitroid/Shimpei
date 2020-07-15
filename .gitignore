@@ -4,3 +4,5 @@ Usage.md
 *.mdva
 *.yap
 .yapviewstack
+
+*.pyc

@@ -1,5 +1,6 @@
+all: 1h.nx3a 1h.dope10.+1.+10.pickle 1h.dope10.yap 1h.dope10.mdva
 %.dope10.pickle: 1h.nx3a dope.py
-	python dope.py $< 10 $@
+	python test_dope.py $< 10 $@
 %.mdva: %.pickle to_mdview.py
 	python to_mdview.py $< > $@
 %.yap: %.pickle to_yaplot.py
@@ -12,3 +13,6 @@
 
 1h.nx3a:
 	genice 1h -r 4 4 4 -f e > $@
+
+clean:
+	-rm 1h.* rm *.mdva *.yap *.pickle
